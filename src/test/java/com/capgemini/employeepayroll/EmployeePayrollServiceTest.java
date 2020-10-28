@@ -29,4 +29,11 @@ public class EmployeePayrollServiceTest {
 		System.out.println(employeeList);
 		assertEquals(3, entries);
 	}
+	
+	@Test
+	public void givenEmployeePayrollInDB_WhenRetrieved_ShouldMatchEmployeeCount() {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO);
+		assertEquals(3, employeePayrollData.size());
+	}
 }

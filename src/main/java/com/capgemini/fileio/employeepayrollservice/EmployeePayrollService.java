@@ -73,7 +73,9 @@ public class EmployeePayrollService {
 	public List<EmployeePayrollData> readData(IOService ioService) {
 		if(ioService.equals(IOService.FILE_IO))
 			 return new EmployeePayrollFileIOService().readData();
-		else 
+		else if(ioService.equals(IOService.DB_IO))
+			 return new EmployeePayrollDBService().readData();
+		else
 			return null;
 	}
 }
