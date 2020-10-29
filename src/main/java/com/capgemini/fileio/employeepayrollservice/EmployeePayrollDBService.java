@@ -42,6 +42,9 @@ public class EmployeePayrollDBService {
 		return employeePayrollList;
 	}
 	
+	/**
+	 * Prepared statement for retrieving employee data
+	 */
 	private void preparedStatementForEmployeeData() {
 		try {
 			Connection connection = this.getConnection();
@@ -53,6 +56,10 @@ public class EmployeePayrollDBService {
 		}
 	}
 
+	/**
+	 * @param name
+	 * @return employee payroll list using prepared statement
+	 */
 	public List<EmployeePayrollData> getEmployeePayrollData(String name) {
 		List<EmployeePayrollData> employeePayrollList = null;
 		if(this.employeePayrollDataStatement == null)
