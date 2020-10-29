@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class EmployeePayrollDBService {
 	public enum StatementType {
@@ -68,6 +70,10 @@ public class EmployeePayrollDBService {
 		
 	}
 	
+	/**
+	 * @param sql query
+	 * @return employee payroll list
+	 */
 	public List<EmployeePayrollData> getEmployeePayrollDataUsingSQLQuery(String sql){
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
 		try(Connection connection = this.getConnection()) {
@@ -140,6 +146,24 @@ public class EmployeePayrollDBService {
 		String sql = String.format("SELECT * FROM employee_payroll_2 where start between '%s' AND '%s';", date1, date2);
 		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
+	
+
+	public Map<String, Double> getAverageSalaryByGender() {
+		String sql = "SELECT gender,AVG(salary) FROM employee_payroll_2 GROUP BY gender;";
+		Map<String,Double> genderToAvgSalaryMap = new HashMap<String, Double>();
+		try(Connection connection = this.getConnection()){
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			while(resultSet.next()) {
+				String gender = resultSet.getString("gender");
+				double salary = resultSet.getDouble("AVG(salary)");
+				genderToAvgSalaryMap.put(gender, salary);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return genderToAvgSalaryMap;
+	}
 
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
@@ -151,4 +175,5 @@ public class EmployeePayrollDBService {
 		System.out.println("Connection successful: " + connection);
 		return connection;
 	}
+
 }

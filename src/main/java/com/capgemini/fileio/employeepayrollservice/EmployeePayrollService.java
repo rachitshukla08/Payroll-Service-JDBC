@@ -6,6 +6,7 @@ import java.util.Scanner;
 
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollDBService.StatementType;
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollException.ExceptionType;
+import java.util.Map;
 
 public class EmployeePayrollService {
 	public enum IOService {
@@ -129,5 +130,11 @@ public class EmployeePayrollService {
 	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2) {
 		List<EmployeePayrollData> employeesInGivenDateRangeList = employeePayrollDBService.getEmployeesInGivenDateRangeDB(date1,date2);
 		return employeesInGivenDateRangeList;
+	}
+
+	public Map<String, Double> readAverageSalaryByGender(IOService ioService) {
+		if(ioService.equals(IOService.DB_IO)) 
+			return employeePayrollDBService.getAverageSalaryByGender();
+		return null;
 	}
 }
