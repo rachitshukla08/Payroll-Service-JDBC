@@ -33,15 +33,7 @@ public class EmployeePayrollDBService {
 	 */
 	public List<EmployeePayrollData> readData() {
 		String sql = "SELECT * FROM employee_payroll_2;";
-		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
-		try (Connection connection = this.getConnection();) {
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(sql);
-			employeePayrollList = this.getEmployeePayrollData(resultSet);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return employeePayrollList;
+		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
 
 	/**
@@ -68,6 +60,19 @@ public class EmployeePayrollDBService {
 		try {
 			employeePayrollDataStatement.setString(1, name);
 			ResultSet resultSet = employeePayrollDataStatement.executeQuery();
+			employeePayrollList = this.getEmployeePayrollData(resultSet);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return employeePayrollList;
+		
+	}
+	
+	public List<EmployeePayrollData> getEmployeePayrollDataUsingSQLQuery(String sql){
+		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
+		try(Connection connection = this.getConnection()) {
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
 			employeePayrollList = this.getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
 			e.printStackTrace();
@@ -133,15 +138,7 @@ public class EmployeePayrollDBService {
 	 */
 	public List<EmployeePayrollData> getEmployeesInGivenDateRangeDB(String date1, String date2) {
 		String sql = String.format("SELECT * FROM employee_payroll_2 where start between '%s' AND '%s';", date1, date2);
-		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
-		try (Connection connection = this.getConnection();) {
-			Statement statement = connection.createStatement();
-			ResultSet resultSet = statement.executeQuery(sql);
-			employeePayrollList = getEmployeePayrollData(resultSet);
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
-		return employeePayrollList;
+		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
 
 	private Connection getConnection() throws SQLException {
