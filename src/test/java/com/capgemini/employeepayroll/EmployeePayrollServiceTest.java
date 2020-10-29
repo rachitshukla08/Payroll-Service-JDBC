@@ -110,4 +110,13 @@ public class EmployeePayrollServiceTest {
 		assertTrue(result);
 	}
 	
+	@Test
+	public void givenNewSalaryForEmployeeInNormalisedDB_WhenUpdatedUsingPreparedStatement_ShouldSyncWithDatabase() throws EmployeePayrollException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.NORMALISED);
+		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.PREPARED_STATEMENT,NormalisationType.NORMALISED);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa",NormalisationType.NORMALISED);
+		assertTrue(result);
+	}
+	
 }

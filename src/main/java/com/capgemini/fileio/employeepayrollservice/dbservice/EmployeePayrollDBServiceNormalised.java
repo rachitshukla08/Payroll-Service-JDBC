@@ -39,6 +39,10 @@ public class EmployeePayrollDBServiceNormalised {
 		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
 
+	/**
+	 * @param sql
+	 * @return employee payroll list
+	 */
 	private List<EmployeePayrollData> getEmployeePayrollDataUsingSQLQuery(String sql) {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<EmployeePayrollData>();
 		try (Connection connection = this.getConnection()) {
@@ -51,6 +55,10 @@ public class EmployeePayrollDBServiceNormalised {
 		return employeePayrollList;
 	}
 
+	/**
+	 * @param resultSet
+	 * @return employee payroll list
+	 */
 	private List<EmployeePayrollData> getEmployeePayrollData(ResultSet resultSet) {
 		List<EmployeePayrollData> employeePayrollList = new ArrayList<>();
 		List<String> department = new ArrayList<String>();
@@ -64,9 +72,7 @@ public class EmployeePayrollDBServiceNormalised {
 				String companyName = resultSet.getString("company_name");
 				String dept = resultSet.getString("dept_name");
 				double salary = resultSet.getDouble("basic_pay");
-				System.out.println(dept);
 				department.add(dept);
-				System.out.println(id);
 				String[] departmentArray = new String[department.size()];
 				EmployeePayrollData employee = new EmployeePayrollData(id, name, salary, startDate, gender, companyName,
 						companyId, department.toArray(departmentArray));
@@ -83,6 +89,10 @@ public class EmployeePayrollDBServiceNormalised {
 		return employeePayrollList;
 	}
 	
+	/**
+	 * @param name
+	 * @return employee payroll list
+	 */
 	public List<EmployeePayrollData> getEmployeePayrollData(String name) {
 		List<EmployeePayrollData> employeePayrollList = null;
 		if (this.employeePayrollDataStatementNormalised == null)
@@ -97,6 +107,9 @@ public class EmployeePayrollDBServiceNormalised {
 		return employeePayrollList;
 	}
 	
+	/**
+	 * Prepared statement to get employee data of a particular employee
+	 */
 	private void preparedStatementForEmployeeData() {
 		try {
 			Connection connection = this.getConnection();
@@ -109,7 +122,6 @@ public class EmployeePayrollDBServiceNormalised {
 			e.printStackTrace();
 		}
 	}
-
 
 	/**
 	 * @param name
@@ -128,10 +140,30 @@ public class EmployeePayrollDBServiceNormalised {
 		}
 	}
 
+	/**
+	 * @param name
+	 * @param salary
+	 * @return no of rows affected
+	 */
 	private int updateDataUsingPreparedStatement(String name, double salary) {
+		String sql = "UPDATE payroll SET basic_pay = ? WHERE emp_id = "
+				+ "(SELECT id from employee WHERE employee_name = ?);";
+		try (Connection connection = this.getConnection();) {
+			PreparedStatement preparedStatementUpdate = connection.prepareStatement(sql);
+			preparedStatementUpdate.setDouble(1, salary);
+			preparedStatementUpdate.setString(2, name);
+			return preparedStatementUpdate.executeUpdate();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return 0;
 	}
 
+	/**
+	 * @param name
+	 * @param salary
+	 * @return no of rows affected
+	 */
 	private int updateDataUsingStatement(String name, double salary) {
 		String sql = String.format("UPDATE payroll SET basic_pay = %.2f WHERE emp_id = "
 				+ "(SELECT id from employee WHERE employee_name = '%s');", salary, name);
