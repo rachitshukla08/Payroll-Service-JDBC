@@ -1,5 +1,6 @@
 package com.capgemini.fileio.employeepayrollservice;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -127,14 +128,27 @@ public class EmployeePayrollService {
 		
 	}
 
+	/**
+	 * @param date1
+	 * @param date2
+	 * @return employee list in given date range
+	 */
 	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2) {
 		List<EmployeePayrollData> employeesInGivenDateRangeList = employeePayrollDBService.getEmployeesInGivenDateRangeDB(date1,date2);
 		return employeesInGivenDateRangeList;
 	}
 
+	/**
+	 * @param ioService
+	 * @return Employee name and avg salary map
+	 */
 	public Map<String, Double> readAverageSalaryByGender(IOService ioService) {
 		if(ioService.equals(IOService.DB_IO)) 
 			return employeePayrollDBService.getAverageSalaryByGender();
 		return null;
+	}
+
+	public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) {
+		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayroll(name,salary,startDate,gender));
 	}
 }

@@ -4,6 +4,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 
 import java.awt.Window.Type;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -79,5 +80,13 @@ public class EmployeePayrollServiceTest {
 				averageSalaryByGender.get("F").equals(3000000.00));
 	}
 	
+	@Test
+	public void givenNewEmployee_WhenAdded_ShouldSyncWithDB() {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readData(IOService.DB_IO);
+		employeePayrollService.addEmployeeToPayroll("Mark",50000000.00,LocalDate.now(),"M");
+		boolean result =  employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
+		assertTrue(result);
+	}
 	
 }
