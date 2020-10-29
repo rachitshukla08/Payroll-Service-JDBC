@@ -22,6 +22,9 @@ public class EmployeePayrollDBServiceNormalised {
 	private EmployeePayrollDBServiceNormalised() {
 	}
 
+	/**
+	 * @return singleton instance
+	 */
 	public static EmployeePayrollDBServiceNormalised getInstance() {
 		if (employeePayrollDBServiceNormalised == null)
 			employeePayrollDBServiceNormalised = new EmployeePayrollDBServiceNormalised();
