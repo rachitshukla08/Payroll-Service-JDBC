@@ -1,4 +1,4 @@
-package com.capgemini.fileio.employeepayrollservice;
+package com.capgemini.fileio.employeepayrollservice.dbservice;
 
 import java.sql.Connection;
 import java.sql.Date;
@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import com.capgemini.fileio.employeepayrollservice.EmployeePayrollData;
 
 public class EmployeePayrollDBService {
 	public enum StatementType {

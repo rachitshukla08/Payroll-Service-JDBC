@@ -5,20 +5,29 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-import com.capgemini.fileio.employeepayrollservice.EmployeePayrollDBService.StatementType;
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollException.ExceptionType;
+import com.capgemini.fileio.employeepayrollservice.dbservice.EmployeePayrollDBService;
+import com.capgemini.fileio.employeepayrollservice.dbservice.EmployeePayrollDBService.StatementType;
+import com.capgemini.fileio.employeepayrollservice.dbservice.EmployeePayrollDBServiceNormalised;
+
 import java.util.Map;
 
 public class EmployeePayrollService {
 	public enum IOService {
 		CONSOLE_IO, FILE_IO, DB_IO, REST_IO
 	}
+	
+	public enum NormalisationType{
+		NORMALISED,DENORMALISED
+	}
 
 	public List<EmployeePayrollData> employeePayrollList;
 	private EmployeePayrollDBService employeePayrollDBService;
+	private EmployeePayrollDBServiceNormalised employeePayrollDBServiceNormalised;
 
 	public EmployeePayrollService() {
 		employeePayrollDBService = EmployeePayrollDBService.getInstance();
+		employeePayrollDBServiceNormalised = EmployeePayrollDBServiceNormalised.getInstance();
 	}
 
 	public EmployeePayrollService(List<EmployeePayrollData> employeePayrollList) {
@@ -78,12 +87,17 @@ public class EmployeePayrollService {
 	 * @param ioService
 	 * @return Employee Payroll Data List
 	 */
-	public List<EmployeePayrollData> readData(IOService ioService) {
+	public List<EmployeePayrollData> readData(IOService ioService,NormalisationType normalisationType) {
 		if(ioService.equals(IOService.FILE_IO))
 			 return new EmployeePayrollFileIOService().readData();
 		else if(ioService.equals(IOService.DB_IO)) {
-			employeePayrollList = employeePayrollDBService.readData();
-			 return employeePayrollList;
+			if(normalisationType.equals(NormalisationType.DENORMALISED)) {
+				employeePayrollList = employeePayrollDBService.readData();
+			}
+			else if(normalisationType.equals(NormalisationType.NORMALISED)) {
+				employeePayrollList = employeePayrollDBServiceNormalised.readData();
+			}
+			return employeePayrollList;
 		}
 		else
 			return null;
