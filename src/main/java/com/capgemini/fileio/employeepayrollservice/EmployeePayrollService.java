@@ -108,16 +108,22 @@ public class EmployeePayrollService {
 	 * @param salary
 	 * @throws EmployeePayrollException 
 	 */
-	public void updateEmployeeSalary(String name, double salary,StatementType type) throws EmployeePayrollException {
-		int result = employeePayrollDBService.updateEmployeeData(name,salary,type);
-		EmployeePayrollData employeePayrollData = null;
-		if(result == 0)
-			throw new EmployeePayrollException(ExceptionType.UPDATE_FAIL, "Update Failed");
-		else 
-			 employeePayrollData = this.getEmployeePayrollData(name);
-		if(employeePayrollData!=null) {
-			employeePayrollData.salary = salary;
+	public void updateEmployeeSalary(String name, double salary,StatementType type,NormalisationType normalisationType) throws EmployeePayrollException {
+		int result = 0;
+		if(normalisationType.equals(NormalisationType.DENORMALISED)) {
+			result = employeePayrollDBService.updateEmployeeData(name,salary,type);
 		}
+		else if(normalisationType.equals(NormalisationType.NORMALISED)) {
+			result = employeePayrollDBServiceNormalised.updateEmployeeData(name,salary,type);
+		}
+			EmployeePayrollData employeePayrollData = null;
+			if(result == 0)
+				throw new EmployeePayrollException(ExceptionType.UPDATE_FAIL, "Update Failed");
+			else 
+				 employeePayrollData = this.getEmployeePayrollData(name);
+			if(employeePayrollData!=null) {
+				employeePayrollData.salary = salary;
+			}
 	}
 
 	/**
@@ -136,8 +142,12 @@ public class EmployeePayrollService {
 	 * @param name
 	 * @return true if data is in sync
 	 */
-	public boolean checkEmployeePayrollInSyncWithDB(String name) {
-		List<EmployeePayrollData> checkList = employeePayrollDBService.getEmployeePayrollData(name);
+	public boolean checkEmployeePayrollInSyncWithDB(String name,NormalisationType normalisationType) {
+		List<EmployeePayrollData> checkList = null;
+		if(normalisationType.equals(NormalisationType.DENORMALISED)) 
+			checkList = employeePayrollDBService.getEmployeePayrollData(name);
+		else if(normalisationType.equals(NormalisationType.NORMALISED)) 
+			checkList = employeePayrollDBServiceNormalised.getEmployeePayrollData(name);
 		return checkList.get(0).equals(getEmployeePayrollData(name));
 		
 	}

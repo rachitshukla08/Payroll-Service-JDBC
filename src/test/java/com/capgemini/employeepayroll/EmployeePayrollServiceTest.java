@@ -47,8 +47,8 @@ public class EmployeePayrollServiceTest {
 	public void givenNewSalaryForEmployee_WhenUpdated_ShouldSyncWithDatabase() throws EmployeePayrollException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.DENORMALISED);
-		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.STATEMENT);
-		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa");
+		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.STATEMENT,NormalisationType.DENORMALISED);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa",NormalisationType.DENORMALISED);
 		assertTrue(result);
 	}
 	
@@ -56,8 +56,8 @@ public class EmployeePayrollServiceTest {
 	public void givenNewSalaryForEmployee_WhenUpdatedUsingPreparedStatement_ShouldSyncWithDatabase() throws EmployeePayrollException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.DENORMALISED);
-		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.PREPARED_STATEMENT);
-		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa");
+		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.PREPARED_STATEMENT,NormalisationType.DENORMALISED);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa",NormalisationType.DENORMALISED);
 		assertTrue(result);
 	}
 	
@@ -85,7 +85,7 @@ public class EmployeePayrollServiceTest {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		employeePayrollService.readData(IOService.DB_IO,NormalisationType.DENORMALISED);
 		employeePayrollService.addEmployeeToPayroll("Mark",50000000.00,LocalDate.now(),"M");
-		boolean result =  employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark");
+		boolean result =  employeePayrollService.checkEmployeePayrollInSyncWithDB("Mark",NormalisationType.DENORMALISED);
 		assertTrue(result);
 	}
 	
@@ -99,6 +99,15 @@ public class EmployeePayrollServiceTest {
 			emp.printDepartments();
 		}
 		assertEquals(3, employeePayrollData.size());
+	}
+	
+	@Test
+	public void givenNewSalaryForEmployeeInNormalisedDB_WhenUpdated_ShouldSyncWithDatabase() throws EmployeePayrollException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.NORMALISED);
+		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.STATEMENT,NormalisationType.NORMALISED);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa",NormalisationType.NORMALISED);
+		assertTrue(result);
 	}
 	
 }
