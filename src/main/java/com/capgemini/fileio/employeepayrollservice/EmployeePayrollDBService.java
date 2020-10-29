@@ -137,13 +137,7 @@ public class EmployeePayrollDBService {
 		try (Connection connection = this.getConnection();) {
 			Statement statement = connection.createStatement();
 			ResultSet resultSet = statement.executeQuery(sql);
-			while (resultSet.next()) {
-				int id = resultSet.getInt("id");
-				String name = resultSet.getString("name");
-				double salary = resultSet.getDouble("salary");
-				LocalDate startDate = resultSet.getDate("start").toLocalDate();
-				employeePayrollList.add(new EmployeePayrollData(id, name, salary, startDate));
-			}
+			employeePayrollList = getEmployeePayrollData(resultSet);
 		} catch (SQLException e) {
 			e.printStackTrace();
 		}
