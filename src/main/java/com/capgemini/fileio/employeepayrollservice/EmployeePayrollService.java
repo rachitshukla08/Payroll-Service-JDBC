@@ -125,4 +125,9 @@ public class EmployeePayrollService {
 		return checkList.get(0).equals(getEmployeePayrollData(name));
 		
 	}
+
+	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2) {
+		List<EmployeePayrollData> employeesInGivenDateRangeList = employeePayrollDBService.getEmployeesInGivenDateRangeDB(date1,date2);
+		return employeesInGivenDateRangeList;
+	}
 }
