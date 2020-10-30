@@ -22,7 +22,8 @@ public class EmployeePayrollDBService {
 
 	private PreparedStatement employeePayrollDataStatement;
 	private static EmployeePayrollDBService employeePayrollDBService;
-
+	private int connectionCounter=0;
+	
 	private EmployeePayrollDBService() {
 
 	}
@@ -248,7 +249,8 @@ public class EmployeePayrollDBService {
 		return employeePayrollData;
 	}
 
-	private Connection getConnection() throws SQLException {
+	private synchronized Connection getConnection() throws SQLException {
+		connectionCounter++;
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String userName = "root";
 		String password = "root";
