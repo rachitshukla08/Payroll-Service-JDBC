@@ -265,11 +265,9 @@ public class EmployeePayrollService {
 			Runnable task = () -> {
 				employeeUpdationStatus.put(entry.getKey(), false);
 				System.out.println("Employee being updated:(thread) "+Thread.currentThread().getName());
-				
 					this.updateEmployeeSalary(entry.getKey(), entry.getValue(), statementType, normalisationType);
 					employeeUpdationStatus.put(entry.getKey(), true);
 					System.out.println("Employee updated: (thread) "+Thread.currentThread().getName());
-				
 			};
 			Thread thread = new Thread(task,entry.getKey());
 			thread.start();

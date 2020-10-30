@@ -116,6 +116,11 @@ public class EmployeePayrollDBService {
 		}
 	}
 
+	/**
+	 * @param name
+	 * @param salary
+	 * @return 1 if details updated successfully
+	 */
 	private synchronized int updateDataUsingStatement(String name, double salary) {
 		int rowsAffected=0;
 		String sql1 = String.format("UPDATE employee_payroll_2 SET salary = %.2f where name = '%s';", salary, name);
