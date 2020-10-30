@@ -65,7 +65,7 @@ public class EmployeePayrollServiceTest {
 	public void givenDateRangeForEmployee_WhenRetrievedUsingStatement_ShouldReturnProperData() throws EmployeePayrollException {
 		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
 		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.DENORMALISED);
-		List<EmployeePayrollData> employeeDataInGivenDateRange = employeePayrollService.getEmployeesInDateRange("2018-01-01","2019-11-15");
+		List<EmployeePayrollData> employeeDataInGivenDateRange = employeePayrollService.getEmployeesInDateRange("2018-01-01","2019-11-15",NormalisationType.DENORMALISED);
 		assertEquals(2, employeeDataInGivenDateRange.size());
 	}
 	
@@ -117,6 +117,14 @@ public class EmployeePayrollServiceTest {
 		employeePayrollService.updateEmployeeSalary("Terisa",3000000.00,StatementType.PREPARED_STATEMENT,NormalisationType.NORMALISED);
 		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa",NormalisationType.NORMALISED);
 		assertTrue(result);
+	}
+	
+	@Test
+	public void givenDateRangeForEmployeeInNormalisedDB_WhenRetrievedUsingStatement_ShouldReturnProperData() throws EmployeePayrollException {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.NORMALISED);
+		List<EmployeePayrollData> employeeDataInGivenDateRange = employeePayrollService.getEmployeesInDateRange("2018-01-01","2019-11-15",NormalisationType.NORMALISED);
+		assertEquals(2, employeeDataInGivenDateRange.size());
 	}
 	
 }

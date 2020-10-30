@@ -178,6 +178,15 @@ public class EmployeePayrollDBServiceNormalised {
 		}
 		return 0;
 	}
+	
+	public List<EmployeePayrollData> getEmployeePayrollDataInGivenDateRangeDB(String date1, String date2) {
+		String sql = String.format("SELECT e.id,e.company_id,e.employee_name,e.gender,e.start,c.company_name,d.dept_name,p.basic_pay "
+				+ "FROM employee e JOIN company c" + " ON e.company_id = c.company_id " + "JOIN employee_department d2 "
+				+ "ON e.id = d2.emp_id " + "JOIN department d " + "ON d2.dept_id = d.dept_id " + "JOIN payroll p "
+				+ "ON e.id = p.emp_id "
+				+ "WHERE e.start BETWEEN '%s' AND '%s';",date1,date2);
+		return this.getEmployeePayrollDataUsingSQLQuery(sql);
+	}
 
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";

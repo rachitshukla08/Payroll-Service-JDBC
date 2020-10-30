@@ -70,7 +70,6 @@ public class EmployeePayrollDBService {
 			e.printStackTrace();
 		}
 		return employeePayrollList;
-		
 	}
 	
 	/**

@@ -157,8 +157,12 @@ public class EmployeePayrollService {
 	 * @param date2
 	 * @return employee list in given date range
 	 */
-	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2) {
-		List<EmployeePayrollData> employeesInGivenDateRangeList = employeePayrollDBService.getEmployeesInGivenDateRangeDB(date1,date2);
+	public List<EmployeePayrollData> getEmployeesInDateRange(String date1, String date2,NormalisationType normalisationType) {
+		List<EmployeePayrollData> employeesInGivenDateRangeList = null;
+		if(normalisationType.equals(NormalisationType.DENORMALISED))
+			employeesInGivenDateRangeList = employeePayrollDBService.getEmployeesInGivenDateRangeDB(date1,date2);
+		else if(normalisationType.equals(NormalisationType.NORMALISED))
+			employeesInGivenDateRangeList = employeePayrollDBServiceNormalised.getEmployeePayrollDataInGivenDateRangeDB(date1,date2);
 		return employeesInGivenDateRangeList;
 	}
 
