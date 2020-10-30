@@ -1,6 +1,7 @@
 package com.capgemini.fileio.employeepayrollservice.dbservice;
 
 import java.sql.Connection;
+import java.sql.Date;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -190,18 +191,7 @@ public class EmployeePayrollDBServiceNormalised {
 				+ "WHERE WHERE e.is_active = '1' AND e.start BETWEEN '%s' AND '%s';",date1,date2);
 		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
-
-	private Connection getConnection() throws SQLException {
-		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
-		String userName = "root";
-		String password = "root";
-		Connection connection;
-		System.out.println("Connecting to database: " + jdbcURL);
-		connection = DriverManager.getConnection(jdbcURL, userName, password);
-		System.out.println("Connection successful: " + connection);
-		return connection;
-	}
-
+	
 	public Map<String, Double> getAverageSalaryByGender() {
 		String sql = "SELECT e.gender,AVG(p.basic_pay) "
 				+ "FROM employee e join payroll p "
@@ -220,5 +210,112 @@ public class EmployeePayrollDBServiceNormalised {
 			e.printStackTrace();
 		}
 		return genderToAvgSalaryMap;
+	}
+	
+	public EmployeePayrollData addEmployeeToPayroll(int id, String name, double salary, LocalDate startDate,
+			String gender, String companyName, int companyId, int[] department) {
+		Connection connection = null;
+		EmployeePayrollData employeePayrollData = null;
+		try {
+			connection = this.getConnection();
+			connection.setAutoCommit(false);
+		}catch(SQLException e) {
+			e.printStackTrace();
+		}
+		//Statement 1
+		try(Statement statement = connection.createStatement()){
+			String sql = String.format("INSERT INTO company VALUES (%s,'%s')", companyId,companyName);
+			int rowAffected = statement.executeUpdate(sql);
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		//Statement 2
+		try(Statement statement = connection.createStatement()){
+			String sql = String.format("INSERT INTO employee VALUES( %s, %s,'%s','%s','%s','%s')", 
+					id,companyId,name,gender,Date.valueOf(startDate),"1");
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		//Statement 3
+		try(Statement statement = connection.createStatement()){
+			double deductions = salary*0.2;
+			double taxablePay = salary-deductions;
+			double tax = taxablePay*0.1;
+			double netPay = salary - tax;
+			String sql =  String.format("INSERT INTO payroll (emp_id,basic_pay,deductions,taxable_pay,tax,net_pay) VALUES"
+					+ "( %s, %s, %s ,%s, %s, %s)",id,salary,deductions,taxablePay,tax,netPay);
+			int rowAffected = statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		//Statement 4
+		try(Statement statement = connection.createStatement()){
+			int rowsAffected=0;
+			for(int dept: department) {
+				String sql = String.format("INSERT INTO employee_department VALUES (%s,%s)",id,dept);
+				int rowAffected = statement.executeUpdate(sql);
+				if(rowAffected==1)
+					rowsAffected++;
+			}
+			if(rowsAffected>0)
+				employeePayrollData = new EmployeePayrollData(id, name, salary, startDate, gender, 
+						companyName, companyId, new String[] {"Sales"});
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+				return employeePayrollData;
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		
+		//Final commit
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(connection!=null)
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return employeePayrollData;
+	}
+
+	private Connection getConnection() throws SQLException {
+		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
+		String userName = "root";
+		String password = "root";
+		Connection connection;
+		System.out.println("Connecting to database: " + jdbcURL);
+		connection = DriverManager.getConnection(jdbcURL, userName, password);
+		System.out.println("Connection successful: " + connection);
+		return connection;
 	}
 }

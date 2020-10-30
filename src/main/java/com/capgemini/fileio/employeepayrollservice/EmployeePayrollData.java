@@ -30,6 +30,11 @@ public class EmployeePayrollData {
 		this.department = department;
 	}
 
+	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate startDate) {
+		this(id,name,salary,startDate);
+		this.gender = gender;
+	}
+
 	public String[] getDepartment() {
 		return department;
 	}
