@@ -7,6 +7,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -91,7 +92,7 @@ public class EmployeePayrollServiceTest {
 		assertTrue(result);
 	}
 	
-	//Multithreading UC1 and UC2
+	//Multithreading UC1 to UC4
 	@Test
 	public void given6Employees_WhenAddedToDB_ShouldMatchEmployeeEntries() {
 		EmployeePayrollData[] arrayOfEmps = {
@@ -108,12 +109,26 @@ public class EmployeePayrollServiceTest {
 		employeePayrollService.addEmployeesToPayroll(Arrays.asList(arrayOfEmps));
 		Instant end = Instant.now();
 		Instant threadStart = Instant.now();		
-		employeePayrollService.addEmployeesToPayrollWithThreads(Arrays.asList(arrayOfEmps));
+		//employeePayrollService.addEmployeesToPayrollWithThreads(Arrays.asList(arrayOfEmps));
 		Instant threadEnd = Instant.now();	
 		System.out.println("Duration with thread: "+Duration.between(threadStart, threadEnd));
 		System.out.println("Duration without thread: "+Duration.between(start, end));
 		employeePayrollService.readData(IOService.DB_IO, NormalisationType.DENORMALISED);
 		assertEquals(16, employeePayrollService.countEntries(IOService.DB_IO));
+	}
+	
+	//MultiThreading UC6
+	@Test
+	public void given3Employees_WhenDetailsAreUpdated_ShouldSyncWithDB() {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		List<EmployeePayrollData> employeePayrollData = employeePayrollService.readData(IOService.DB_IO,NormalisationType.DENORMALISED);
+		Map<String,Double> updationDetailsMap = new HashMap<String, Double>();
+		updationDetailsMap.put("Jeff Bezos", 2000000.00);
+		updationDetailsMap.put("Bill Gates", 3000000.00);
+		updationDetailsMap.put("Mark Zuckerberg", 4000000.00);
+		employeePayrollService.updateEmployeesSalaryWithThreads(updationDetailsMap,StatementType.STATEMENT,NormalisationType.DENORMALISED);
+		boolean result = employeePayrollService.checkEmployeePayrollInSyncWithDB("Terisa",NormalisationType.DENORMALISED);
+		assertTrue(result);
 	}
 	
 	//TESTS FOR NORMALISED TABLES

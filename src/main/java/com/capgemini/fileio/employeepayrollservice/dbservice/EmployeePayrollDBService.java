@@ -116,15 +116,56 @@ public class EmployeePayrollDBService {
 		}
 	}
 
-	private int updateDataUsingStatement(String name, double salary) {
-		String sql = String.format("UPDATE employee_payroll_2 SET salary = %.2f where name = '%s';", salary, name);
-		try (Connection connection = this.getConnection();) {
-			Statement statement = connection.createStatement();
-			return statement.executeUpdate(sql);
-		} catch (SQLException e) {
+	private synchronized int updateDataUsingStatement(String name, double salary) {
+		int rowsAffected=0;
+		String sql1 = String.format("UPDATE employee_payroll_2 SET salary = %.2f where name = '%s';", salary, name);
+		double deductions = salary*0.2;
+		double taxablePay = salary-deductions;
+		double tax = taxablePay*0.1;
+		double netPay = salary - tax;
+		String sql2 = String.format("UPDATE payroll_details_2 SET basic_pay = %.2f,deductions = %.2f, "
+				+ "taxable_pay=%.2f, tax = %.2f, net_pay = %.2f where employee_id = "
+				+ "(SELECT id from employee_payroll_2 WHERE name = '%s');",salary,deductions,taxablePay,tax,netPay,name);
+		Connection connection=null;
+		try {
+			connection = this.getConnection();
+			connection.setAutoCommit(false);
+		}catch(SQLException e) {
 			e.printStackTrace();
 		}
-		return 0;
+		try(Statement statement = connection.createStatement()){
+			statement.executeUpdate(sql1);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		} 
+		try(Statement statement = connection.createStatement()){
+			statement.executeUpdate(sql2);
+		} catch (SQLException e) {
+			e.printStackTrace();
+			try {
+				connection.rollback();
+			} catch (SQLException e1) {
+				e1.printStackTrace();
+			}
+		}
+		try {
+			connection.commit();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}finally {
+			if(connection!=null)
+				try {
+					connection.close();
+				} catch (SQLException e) {
+					e.printStackTrace();
+				}
+		}
+		return rowsAffected;
 	}
 
 	private int updateDataUsingPreparedStatement(String name, double salary) {
@@ -249,7 +290,7 @@ public class EmployeePayrollDBService {
 		return employeePayrollData;
 	}
 
-	private synchronized Connection getConnection() throws SQLException {
+	private Connection getConnection() throws SQLException {
 		connectionCounter++;
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String userName = "root";

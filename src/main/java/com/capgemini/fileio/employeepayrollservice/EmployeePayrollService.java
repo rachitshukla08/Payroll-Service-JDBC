@@ -106,29 +106,6 @@ public class EmployeePayrollService {
 
 	/**
 	 * @param name
-	 * @param salary
-	 * @throws EmployeePayrollException 
-	 */
-	public void updateEmployeeSalary(String name, double salary,StatementType type,NormalisationType normalisationType) throws EmployeePayrollException {
-		int result = 0;
-		if(normalisationType.equals(NormalisationType.DENORMALISED)) {
-			result = employeePayrollDBService.updateEmployeeData(name,salary,type);
-		}
-		else if(normalisationType.equals(NormalisationType.NORMALISED)) {
-			result = employeePayrollDBServiceNormalised.updateEmployeeData(name,salary,type);
-		}
-			EmployeePayrollData employeePayrollData = null;
-			if(result == 0)
-				throw new EmployeePayrollException(ExceptionType.UPDATE_FAIL, "Update Failed");
-			else 
-				 employeePayrollData = this.getEmployeePayrollData(name);
-			if(employeePayrollData!=null) {
-				employeePayrollData.salary = salary;
-			}
-	}
-
-	/**
-	 * @param name
 	 * @return Employee corresponding to name
 	 */
 	private EmployeePayrollData getEmployeePayrollData(String name) {
@@ -181,10 +158,28 @@ public class EmployeePayrollService {
 		return null;
 	}
 
+	/**
+	 * @param name
+	 * @param salary
+	 * @param startDate
+	 * @param gender
+	 * For denormalised tables
+	 */
 	public void addEmployeeToPayroll(String name, double salary, LocalDate startDate, String gender) {
 		employeePayrollList.add(employeePayrollDBService.addEmployeeToPayroll(name,salary,startDate,gender));
 	}
 	
+	/**
+	 * @param id
+	 * @param name
+	 * @param salary
+	 * @param startDate
+	 * @param gender
+	 * @param companyName
+	 * @param companyId
+	 * @param departments
+	 * For normalised tables
+	 */
 	public void addEmployeeToPayroll(int id, String name, double salary, LocalDate startDate,
 			String gender,String companyName,int companyId,int departments[]) {
 		employeePayrollList.add(employeePayrollDBServiceNormalised.addEmployeeToPayroll(id,name,salary,startDate,
@@ -231,5 +226,60 @@ public class EmployeePayrollService {
 			}
 		}
 		System.out.println(employeePayrollList);
+	}
+	
+
+	/**
+	 * @param name
+	 * @param salary
+	 * @throws EmployeePayrollException 
+	 */
+	public void updateEmployeeSalary(String name, double salary,StatementType type,NormalisationType normalisationType)  {
+		int result = 0;
+		if(normalisationType.equals(NormalisationType.DENORMALISED)) {
+			result = employeePayrollDBService.updateEmployeeData(name,salary,type);
+		}
+		else if(normalisationType.equals(NormalisationType.NORMALISED)) {
+			result = employeePayrollDBServiceNormalised.updateEmployeeData(name,salary,type);
+		}
+			EmployeePayrollData employeePayrollData = null;
+			if(result == 0)
+				return;
+			else 
+				 employeePayrollData = this.getEmployeePayrollData(name);
+			if(employeePayrollData!=null) {
+				employeePayrollData.salary = salary;
+			}
+	}
+
+	/**
+	 * @param updationDetailsMap
+	 * @param statementType
+	 * @param normalisationType
+	 * Update employee salary using threads
+	 */
+	public void updateEmployeesSalaryWithThreads(Map<String,Double> updationDetailsMap, StatementType statementType,
+			NormalisationType normalisationType) {
+		Map<String,Boolean> employeeUpdationStatus = new HashMap<String, Boolean>();
+		updationDetailsMap.entrySet().forEach(entry->{
+			Runnable task = () -> {
+				employeeUpdationStatus.put(entry.getKey(), false);
+				System.out.println("Employee being updated:(thread) "+Thread.currentThread().getName());
+				
+					this.updateEmployeeSalary(entry.getKey(), entry.getValue(), statementType, normalisationType);
+					employeeUpdationStatus.put(entry.getKey(), true);
+					System.out.println("Employee updated: (thread) "+Thread.currentThread().getName());
+				
+			};
+			Thread thread = new Thread(task,entry.getKey());
+			thread.start();
+		});
+		while(employeeUpdationStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			}catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 }

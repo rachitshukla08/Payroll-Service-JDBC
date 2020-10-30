@@ -23,6 +23,7 @@ public class EmployeePayrollData {
 		this(id,name,salary);
 		this.startDate = startDate;
 	}
+	
 	public EmployeePayrollData(int id, String name, double salary, LocalDate startDate, String gender, String companyName,int companyId,String department[]) {
 		this(id,name,salary,startDate);
 		this.gender = gender;
