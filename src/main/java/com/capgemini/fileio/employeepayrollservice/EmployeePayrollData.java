@@ -1,6 +1,7 @@
 package com.capgemini.fileio.employeepayrollservice;
 
 import java.time.LocalDate;
+import java.util.Objects;
 
 public class EmployeePayrollData {
 	public int id;
@@ -63,6 +64,11 @@ public class EmployeePayrollData {
 		EmployeePayrollData that = (EmployeePayrollData)o;
 		return id == that.id && Double.compare(that.salary,salary)==0 &&
 				name.equals(that.name);
+	}
+	
+	@Override
+	public int hashCode() {
+		return Objects.hash(id,name,gender,salary,startDate);
 	}
 	
 	public void printDepartments() {

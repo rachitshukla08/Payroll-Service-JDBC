@@ -2,6 +2,7 @@ package com.capgemini.fileio.employeepayrollservice;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
@@ -190,6 +191,10 @@ public class EmployeePayrollService {
 				gender,companyName,companyId,departments));
 	}
 
+	/**
+	 * @param employeePayrollDataList
+	 * Multithreading UC1
+	 */
 	public void addEmployeesToPayroll(List<EmployeePayrollData> employeePayrollDataList) {
 		employeePayrollDataList.forEach(employeePayrollData->{
 			System.out.println("Employee being added: "+employeePayrollData.name);
@@ -198,5 +203,33 @@ public class EmployeePayrollService {
 			System.out.println("Employee added: "+employeePayrollData.name);
 		});
 		System.out.println(employeePayrollDataList);
+	}
+
+	/**
+	 * @param asList
+	 * Multithreading UC2
+	 */
+	public void addEmployeesToPayrollWithThreads(List<EmployeePayrollData> empList) {
+		Map<Integer,Boolean> employeeAdditionStatus = new HashMap<Integer, Boolean>();
+		empList.forEach(employeePayrollData -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
+				System.out.println("Employee being added:(threads) "+Thread.currentThread().getName());
+				this.addEmployeeToPayroll(employeePayrollData.name, employeePayrollData.salary, 
+						employeePayrollData.startDate, employeePayrollData.gender);
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
+				System.out.println("Employee added: (threads)"+Thread.currentThread().getName());
+			};
+			Thread thread = new Thread(task,employeePayrollData.name);
+			thread.start();
+		});
+		while(employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			}catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+		System.out.println(employeePayrollList);
 	}
 }

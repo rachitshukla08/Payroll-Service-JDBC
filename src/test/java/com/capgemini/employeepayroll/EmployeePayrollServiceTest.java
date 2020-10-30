@@ -91,6 +91,7 @@ public class EmployeePayrollServiceTest {
 		assertTrue(result);
 	}
 	
+	//Multithreading UC1 and UC2
 	@Test
 	public void given6Employees_WhenAddedToDB_ShouldMatchEmployeeEntries() {
 		EmployeePayrollData[] arrayOfEmps = {
@@ -106,9 +107,13 @@ public class EmployeePayrollServiceTest {
 		Instant start = Instant.now();
 		employeePayrollService.addEmployeesToPayroll(Arrays.asList(arrayOfEmps));
 		Instant end = Instant.now();
+		Instant threadStart = Instant.now();		
+		employeePayrollService.addEmployeesToPayrollWithThreads(Arrays.asList(arrayOfEmps));
+		Instant threadEnd = Instant.now();	
+		System.out.println("Duration with thread: "+Duration.between(threadStart, threadEnd));
 		System.out.println("Duration without thread: "+Duration.between(start, end));
 		employeePayrollService.readData(IOService.DB_IO, NormalisationType.DENORMALISED);
-		assertEquals(10, employeePayrollService.countEntries(IOService.DB_IO));
+		assertEquals(16, employeePayrollService.countEntries(IOService.DB_IO));
 	}
 	
 	//TESTS FOR NORMALISED TABLES
