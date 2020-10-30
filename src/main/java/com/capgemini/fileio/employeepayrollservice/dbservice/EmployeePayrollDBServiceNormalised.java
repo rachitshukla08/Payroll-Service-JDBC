@@ -8,7 +8,9 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollData;
 import com.capgemini.fileio.employeepayrollservice.dbservice.EmployeePayrollDBService.StatementType;
@@ -38,7 +40,8 @@ public class EmployeePayrollDBServiceNormalised {
 		String sql = "SELECT e.id,e.company_id,e.employee_name,e.gender,e.start,c.company_name,d.dept_name,p.basic_pay "
 				+ "FROM employee e JOIN company c" + " ON e.company_id = c.company_id " + "JOIN employee_department d2 "
 				+ "ON e.id = d2.emp_id " + "JOIN department d " + "ON d2.dept_id = d.dept_id " + "JOIN payroll p "
-				+ "ON e.id = p.emp_id;";
+				+ "ON e.id = p.emp_id "
+				+ "WHERE e.is_active = '1';";
 		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
 
@@ -184,7 +187,7 @@ public class EmployeePayrollDBServiceNormalised {
 				+ "FROM employee e JOIN company c" + " ON e.company_id = c.company_id " + "JOIN employee_department d2 "
 				+ "ON e.id = d2.emp_id " + "JOIN department d " + "ON d2.dept_id = d.dept_id " + "JOIN payroll p "
 				+ "ON e.id = p.emp_id "
-				+ "WHERE e.start BETWEEN '%s' AND '%s';",date1,date2);
+				+ "WHERE WHERE e.is_active = '1' AND e.start BETWEEN '%s' AND '%s';",date1,date2);
 		return this.getEmployeePayrollDataUsingSQLQuery(sql);
 	}
 
@@ -197,5 +200,25 @@ public class EmployeePayrollDBServiceNormalised {
 		connection = DriverManager.getConnection(jdbcURL, userName, password);
 		System.out.println("Connection successful: " + connection);
 		return connection;
+	}
+
+	public Map<String, Double> getAverageSalaryByGender() {
+		String sql = "SELECT e.gender,AVG(p.basic_pay) "
+				+ "FROM employee e join payroll p "
+				+ "ON e.id = p.emp_id where e.is_active = '1' "
+				+ "GROUP BY e.gender;";
+		Map<String,Double> genderToAvgSalaryMap = new HashMap<String, Double>();
+		try(Connection connection = this.getConnection()){
+			Statement statement = connection.createStatement();
+			ResultSet resultSet = statement.executeQuery(sql);
+			while(resultSet.next()) {
+				String gender = resultSet.getString("gender");
+				double salary = resultSet.getDouble("AVG(p.basic_pay)");
+				genderToAvgSalaryMap.put(gender, salary);
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return genderToAvgSalaryMap;
 	}
 }

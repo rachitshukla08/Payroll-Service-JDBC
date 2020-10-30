@@ -170,9 +170,13 @@ public class EmployeePayrollService {
 	 * @param ioService
 	 * @return Employee name and avg salary map
 	 */
-	public Map<String, Double> readAverageSalaryByGender(IOService ioService) {
-		if(ioService.equals(IOService.DB_IO)) 
-			return employeePayrollDBService.getAverageSalaryByGender();
+	public Map<String, Double> readAverageSalaryByGender(IOService ioService,NormalisationType normalisationType) {
+		if(ioService.equals(IOService.DB_IO)) {
+			if(normalisationType.equals(NormalisationType.DENORMALISED))
+				return employeePayrollDBService.getAverageSalaryByGender();
+			else if(normalisationType.equals(NormalisationType.NORMALISED))
+				return employeePayrollDBServiceNormalised.getAverageSalaryByGender();
+		}
 		return null;
 	}
 
