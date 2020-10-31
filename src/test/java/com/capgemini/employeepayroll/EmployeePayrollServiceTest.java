@@ -188,4 +188,12 @@ public class EmployeePayrollServiceTest {
 		assertTrue(result);
 	}
 	
+	@Test
+	public void givenEmployee_WhenRemoved_ShouldSetIsActiveToFalse() {
+		EmployeePayrollService employeePayrollService = new EmployeePayrollService();
+		employeePayrollService.readData(IOService.DB_IO,NormalisationType.NORMALISED);
+		boolean result =  employeePayrollService.removeEmployee(103);
+		assertTrue(result);
+	}
+	
 }

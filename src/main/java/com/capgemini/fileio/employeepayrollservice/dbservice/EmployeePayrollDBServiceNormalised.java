@@ -308,6 +308,21 @@ public class EmployeePayrollDBServiceNormalised {
 		return employeePayrollData;
 	}
 
+	/**
+	 * @param id
+	 * @return number of rows affected
+	 */
+	public int removeEmployee(int id) {
+		String sql = String.format("UPDATE employee SET is_active = 0 WHERE id = %s",id);
+		try (Connection connection = this.getConnection();) {
+			Statement statement = connection.createStatement();
+			return statement.executeUpdate(sql);
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return 0;
+	}
+
 	private Connection getConnection() throws SQLException {
 		String jdbcURL = "jdbc:mysql://localhost:3306/payroll_service?useSSL=false";
 		String userName = "root";

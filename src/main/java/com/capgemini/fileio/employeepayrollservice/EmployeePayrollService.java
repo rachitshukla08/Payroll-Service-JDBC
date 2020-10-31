@@ -280,4 +280,12 @@ public class EmployeePayrollService {
 			}
 		}
 	}
+
+	public boolean removeEmployee(int id) {
+		int result = employeePayrollDBServiceNormalised.removeEmployee(id);
+		if(result==1)
+			return true;
+		else 
+			return false;
+	}
 }
