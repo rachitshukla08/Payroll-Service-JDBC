@@ -227,6 +227,14 @@ public class EmployeePayrollDBServiceNormalised {
 			String sql = String.format("INSERT INTO company VALUES (%s,'%s')", companyId,companyName);
 			int rowAffected = statement.executeUpdate(sql);
 			
+			if(rowAffected>0) {
+				String sql2 = String.format("SELECT company_id FROM company WHERE company_name='%s';",companyName);
+				Statement stmt = connection.createStatement();
+				ResultSet resultSet = stmt.executeQuery(sql2);
+				while(resultSet.next()) {
+					companyId = resultSet.getInt("company_id");
+				}
+			}
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
@@ -239,8 +247,9 @@ public class EmployeePayrollDBServiceNormalised {
 		
 		//Statement 2
 		try(Statement statement = connection.createStatement()){
-			String sql = String.format("INSERT INTO employee VALUES( %s, %s,'%s','%s','%s','%s')", 
-					id,companyId,name,gender,Date.valueOf(startDate),"1");
+			String sql = String.format("INSERT INTO employee(id,company_id,employee_name,gender,start) VALUES( %s, %s,'%s','%s','%s')", 
+					id,companyId,name,gender,Date.valueOf(startDate));
+			int rowAffected = statement.executeUpdate(sql);
 		} catch (SQLException e) {
 			e.printStackTrace();
 			try {
