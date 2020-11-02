@@ -222,7 +222,7 @@ public class EmployeePayrollServiceTest {
 		EmployeePayrollService employeePayrollService;
 		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
 		long entries = employeePayrollService.countEntries(IOService.REST_IO);
-		assertEquals(3, entries);
+		assertEquals(6, entries);
 	}
 	
 	//UC1 REST
@@ -237,10 +237,10 @@ public class EmployeePayrollServiceTest {
 		assertEquals(201, statusCode);
 		employeePayrollData = new Gson().fromJson(response.asString(), EmployeePayrollData.class);
 		employeePayrollService.addEmployeeToPayroll(employeePayrollData, IOService.REST_IO);
-		assertEquals(3, employeePayrollService.countEntries(IOService.REST_IO));
+		assertEquals(7, employeePayrollService.countEntries(IOService.REST_IO));
 	}
 
-	public Response addEmployeeToJSONServer(EmployeePayrollData employeePayrollData) {
+	public synchronized Response addEmployeeToJSONServer(EmployeePayrollData employeePayrollData) {
 		String empJson = new Gson().toJson(employeePayrollData);
 		System.out.println(empJson);
 		RequestSpecification request = RestAssured.given();
@@ -249,4 +249,42 @@ public class EmployeePayrollServiceTest {
 		return request.post("/employee_payroll");
 	}
 	
+	//UC2 REST
+	@Test
+	public void given3Employees_WhenAdded_ShouldMatchCount() {
+		EmployeePayrollData[] arrayOfEmps = getEmployeeList();
+		EmployeePayrollService employeePayrollService;
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
+		EmployeePayrollData[] arrayOfEmpPayrolls = {
+				new EmployeePayrollData(0, "Sunder", "M", 600000.0,LocalDate.now()),
+				new EmployeePayrollData(0, "Mukesh", "M", 1000000.0,LocalDate.now()),
+				new EmployeePayrollData(0, "Anil", "M", 200000.0,LocalDate.now())
+		};
+		addEmployeesToJSONPayrollWithThreads(Arrays.asList(arrayOfEmpPayrolls));
+		arrayOfEmps = getEmployeeList();
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
+		assertEquals(6, employeePayrollService.countEntries(IOService.REST_IO));
+	}
+	
+	public void addEmployeesToJSONPayrollWithThreads(List<EmployeePayrollData> empList) {
+		Map<Integer,Boolean> employeeAdditionStatus = new HashMap<Integer, Boolean>();
+		empList.forEach(employeePayrollData -> {
+			Runnable task = () -> {
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), false);
+				System.out.println("Employee being added:(threads) "+Thread.currentThread().getName());
+				this.addEmployeeToJSONServer(employeePayrollData);
+				employeeAdditionStatus.put(employeePayrollData.hashCode(), true);
+				System.out.println("Employee added: (threads)"+Thread.currentThread().getName());
+			};
+			Thread thread = new Thread(task,employeePayrollData.name);
+			thread.start();
+		});
+		while(employeeAdditionStatus.containsValue(false)) {
+			try {
+				Thread.sleep(10);
+			}catch(InterruptedException e) {
+				e.printStackTrace();
+			}
+		}
+	}
 }
