@@ -1,6 +1,7 @@
 package com.capgemini.fileio.employeepayrollservice;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Objects;
 
 public class EmployeePayrollData {
@@ -55,8 +56,11 @@ public class EmployeePayrollData {
 
 	@Override
 	public String toString() {
-		return "id =" + id + ",name =" + name + ",salary =" + salary;
+		return "EmployeePayrollData [id=" + id + ", name=" + name + ", salary=" + salary + ", startDate=" + startDate
+				+ ", gender=" + gender + ", companyName=" + companyName + ", companyId=" + companyId + ", department="
+				+ Arrays.toString(department) + "]";
 	}
+	
 
 	@Override
 	public boolean equals(Object o) {

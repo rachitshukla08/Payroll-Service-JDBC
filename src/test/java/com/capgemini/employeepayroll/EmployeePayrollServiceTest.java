@@ -11,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollData;
@@ -19,6 +20,10 @@ import com.capgemini.fileio.employeepayrollservice.EmployeePayrollService;
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollService.IOService;
 import com.capgemini.fileio.employeepayrollservice.EmployeePayrollService.NormalisationType;
 import com.capgemini.fileio.employeepayrollservice.dbservice.EmployeePayrollDBService.StatementType;
+import com.google.gson.Gson;
+
+import io.restassured.RestAssured;
+import io.restassured.response.Response;
 
 public class EmployeePayrollServiceTest {
 	
@@ -140,7 +145,7 @@ public class EmployeePayrollServiceTest {
 		for(EmployeePayrollData emp : employeePayrollData ) {
 			emp.printDepartments();
 		}
-		assertEquals(3, employeePayrollData.size());
+		assertEquals(4, employeePayrollData.size());
 	}
 	
 	@Test
@@ -194,5 +199,28 @@ public class EmployeePayrollServiceTest {
 		employeePayrollService.readData(IOService.DB_IO,NormalisationType.NORMALISED);
 		boolean result =  employeePayrollService.removeEmployee(103);
 		assertTrue(result);
+	}
+	
+	@Before
+	public void setup() {
+		RestAssured.baseURI = "http://localhost";
+		RestAssured.port = 3000;
+	}
+	
+	public EmployeePayrollData[] getEmployeeList() {
+		Response response = RestAssured.get("/employee_payroll");
+		System.out.println("Employee entries in JSON SERVER : "+response.asString());
+		EmployeePayrollData[] arrayOfEmps = new Gson().fromJson(response.asString(), EmployeePayrollData[].class);
+		return arrayOfEmps;
+	}
+	
+	//UC4 REST
+	@Test
+	public void givenEmployeeDataInJSONServer_WhenRetrieved_ShouldMatchTheCount() {
+		EmployeePayrollData[] arrayOfEmps = getEmployeeList();
+		EmployeePayrollService employeePayrollService;
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
+		long entries = employeePayrollService.countEntries(IOService.REST_IO);
+		assertEquals(2, entries);
 	}
 }
