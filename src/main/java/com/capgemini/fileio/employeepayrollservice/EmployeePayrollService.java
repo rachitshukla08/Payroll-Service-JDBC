@@ -186,6 +186,13 @@ public class EmployeePayrollService {
 		employeePayrollList.add(employeePayrollDBServiceNormalised.addEmployeeToPayroll(id,name,salary,startDate,
 				gender,companyName,companyId,departments));
 	}
+	
+	public void addEmployeeToPayroll(EmployeePayrollData employeePayrollData,IOService ioService) {
+		if(ioService.equals(IOService.DB_IO))
+			this.addEmployeeToPayroll(employeePayrollData.name, employeePayrollData.salary, employeePayrollData.startDate, 
+					employeePayrollData.gender);
+		else employeePayrollList.add(employeePayrollData);
+	}
 
 	/**
 	 * @param employeePayrollDataList
@@ -200,7 +207,7 @@ public class EmployeePayrollService {
 		});
 		System.out.println(employeePayrollDataList);
 	}
-
+	
 	/**
 	 * @param asList
 	 * Multithreading UC2

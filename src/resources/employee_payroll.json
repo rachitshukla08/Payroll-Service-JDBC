@@ -1,27 +1,38 @@
 {
-	"employee_payroll":[
+  "employee_payroll": [
     {
       "id": 1,
       "name": "Jeff Bezos",
       "gender": "M",
-	  "salary": 100000,
-	  "startDate" : {
-		"year": 2020,
-		"month": 11,
-		"day": 1
-	  }
+      "salary": 100000,
+      "startDate": {
+        "year": 2020,
+        "month": 11,
+        "day": 1
+      }
     },
-	{
+    {
       "id": 2,
       "name": "Bill Gates",
       "gender": "M",
-	  "salary": 200000,
-	  "startDate" : {
-		"year": 2020,
-		"month": 11,
-		"day": 1
-	  }
+      "salary": 200000,
+      "startDate": {
+        "year": 2020,
+        "month": 11,
+        "day": 1
+      }
+    },
+    {
+      "id": 3,
+      "name": "Mark Zuckerberg",
+      "salary": 300000,
+      "startDate": {
+        "year": 2020,
+        "month": 11,
+        "day": 2
+      },
+      "gender": "M",
+      "companyId": 0
     }
-	]
+  ]
 }
- 

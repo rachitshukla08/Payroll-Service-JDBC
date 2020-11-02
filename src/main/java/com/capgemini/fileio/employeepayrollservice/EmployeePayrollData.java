@@ -34,8 +34,11 @@ public class EmployeePayrollData {
 	}
 
 	public EmployeePayrollData(int id, String name, String gender, double salary, LocalDate startDate) {
-		this(id,name,salary,startDate);
+		this.id = id;
+		this.name = name;
 		this.gender = gender;
+		this.salary = salary;
+		this.startDate = startDate;
 	}
 
 	public String[] getDepartment() {
