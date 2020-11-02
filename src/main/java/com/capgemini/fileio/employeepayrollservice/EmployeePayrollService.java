@@ -109,7 +109,7 @@ public class EmployeePayrollService {
 	 * @param name
 	 * @return Employee corresponding to name
 	 */
-	private EmployeePayrollData getEmployeePayrollData(String name) {
+	public EmployeePayrollData getEmployeePayrollData(String name) {
 		EmployeePayrollData employeePayrollData = this.employeePayrollList.stream()
 				.filter(employee->employee.name.equals(name))
 				.findFirst()
@@ -295,5 +295,19 @@ public class EmployeePayrollService {
 			return true;
 		else 
 			return false;
+	}
+
+	/**
+	 * UC3 REST 
+	 * @param name
+	 * @param salary
+	 * @param ioService
+	 */
+	public void updateEmployeeSalary(String name, double salary, IOService ioService) {
+		if(ioService.equals(IOService.REST_IO)) {
+			EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+			if(employeePayrollData!=null)
+				employeePayrollData.salary = salary;
+		}
 	}
 }

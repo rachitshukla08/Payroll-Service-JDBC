@@ -287,4 +287,21 @@ public class EmployeePayrollServiceTest {
 			}
 		}
 	}
+	
+	//UC3
+	@Test
+	public void givenNewSalary_WhenUpdated_ShouldMatch200Response() {
+		EmployeePayrollData[] arrayOfEmps = getEmployeeList();
+		EmployeePayrollService employeePayrollService;
+		employeePayrollService = new EmployeePayrollService(Arrays.asList(arrayOfEmps));
+		employeePayrollService.updateEmployeeSalary("Anil", 3000000.00, IOService.REST_IO);
+		EmployeePayrollData employeePayrollData = employeePayrollService.getEmployeePayrollData("Anil");
+		String empJson = new Gson().toJson(employeePayrollData);
+		RequestSpecification request = RestAssured.given();
+		request.header("Content-Type","application/json");
+		request.body(empJson);
+		Response response = request.put("/employee_payroll/"+employeePayrollData.id);
+		int statusCode = response.getStatusCode();
+		assertEquals(200, statusCode);
+	}
 }
