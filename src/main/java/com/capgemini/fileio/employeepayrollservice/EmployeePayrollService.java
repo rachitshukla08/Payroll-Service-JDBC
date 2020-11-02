@@ -310,4 +310,16 @@ public class EmployeePayrollService {
 				employeePayrollData.salary = salary;
 		}
 	}
+
+	/**
+	 * UC5 REST Delete an employee's data
+	 * @param name
+	 * @param restIo
+	 */
+	public void deleteEmployeePayrollJSONServer(String name, IOService ioService) {
+		if(ioService.equals(IOService.REST_IO)) {
+			EmployeePayrollData employeePayrollData = this.getEmployeePayrollData(name);
+			employeePayrollList.remove(employeePayrollData);
+		}
+	}
 }
